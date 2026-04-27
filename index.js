@@ -25,7 +25,7 @@ const app = express()
 // ── CORS ──────────────────────────────────────
 app.use(cors())
 
-const ALLOWED_ORIGIN = process.env.FRONTEND_URL || 'https://cot-xui.vercel.app/'
+const ALLOWED_ORIGIN = process.env.FRONTEND_URL || 'https://cot-xui.vercel.app'
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', ALLOWED_ORIGIN)
