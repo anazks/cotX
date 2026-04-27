@@ -11,10 +11,10 @@
 // Future tools follow same pattern:
 //   /api/negohelp/*          — NegoHelp tool routes
 
-const path     = require('path')
-const express  = require('express')
+const path = require('path')
+const express = require('express')
 const mongoose = require('mongoose')
-const cors     = require('cors')
+const cors = require('cors')
 
 // Load .env from the same directory as this file (server/)
 // Using __dirname makes this work regardless of where `node` is invoked from.
@@ -25,7 +25,7 @@ const app = express()
 // ── CORS ──────────────────────────────────────
 app.use(cors())
 
-const ALLOWED_ORIGIN = process.env.FRONTEND_URL || 'http://localhost:5173'
+const ALLOWED_ORIGIN = process.env.FRONTEND_URL || 'https://cot-xui.vercel.app/'
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', ALLOWED_ORIGIN)
@@ -41,26 +41,26 @@ app.use(express.json({ limit: '25mb' }))
 app.use(express.urlencoded({ extended: true, limit: '25mb' }))
 
 // ── Platform-level routes ─────────────────────
-const authRoutes     = require('./src/routes/authRoutes')
-const adminRoutes    = require('./src/routes/adminRoutes')
+const authRoutes = require('./src/routes/authRoutes')
+const adminRoutes = require('./src/routes/adminRoutes')
 const customerRoutes = require('./src/routes/customerRoutes')
-const partRoutes     = require('./src/routes/partRoutes')
+const partRoutes = require('./src/routes/partRoutes')
 
-app.use('/api/auth',      authRoutes)
-app.use('/api/admin',     adminRoutes)
+app.use('/api/auth', authRoutes)
+app.use('/api/admin', adminRoutes)
 app.use('/api/customers', customerRoutes)
-app.use('/api/parts',     partRoutes)
+app.use('/api/parts', partRoutes)
 
 // ── QuoteX tool routes ────────────────────────
 const quotationRoutes = require('./src/routes/quotex/quotationRoutes')
-const pdfRoutes       = require('./src/routes/quotex/pdfRoutes')
+const pdfRoutes = require('./src/routes/quotex/pdfRoutes')
 const analyticsRoutes = require('./src/routes/quotex/analyticsRoutes')
-const teamRoutes      = require('./src/routes/quotex/teamRoutes')
+const teamRoutes = require('./src/routes/quotex/teamRoutes')
 
 app.use('/api/quotex/quotations', quotationRoutes)
-app.use('/api/quotex/pdf',        pdfRoutes)
-app.use('/api/quotex/analytics',  analyticsRoutes)
-app.use('/api/quotex/teams',       teamRoutes)
+app.use('/api/quotex/pdf', pdfRoutes)
+app.use('/api/quotex/analytics', analyticsRoutes)
+app.use('/api/quotex/teams', teamRoutes)
 
 // ── Future tool routes added here ────────────
 // const negoRoutes = require('./src/routes/negohelp/negoRoutes')
@@ -72,10 +72,10 @@ app.use('/api/quotex/teams',       teamRoutes)
 // Returns 200 with server status and timestamp.
 app.get('/api/health', (req, res) => {
   res.status(200).json({
-    status:    'ok',
-    service:   'Arc API',
+    status: 'ok',
+    service: 'Arc API',
     timestamp: new Date().toISOString(),
-    uptime:    Math.floor(process.uptime()) + 's',
+    uptime: Math.floor(process.uptime()) + 's',
   })
 })
 
@@ -101,7 +101,7 @@ app.get('/', (req, res) => {
 app.get('/api/health/external', async (req, res) => {
   try {
     const { testFrankfurterConnectivity } = require('./src/controllers/analyticsController')
-    const { testSmtpConnectivity }        = require('./src/jobs/emailService')
+    const { testSmtpConnectivity } = require('./src/jobs/emailService')
 
     // Run both checks in parallel
     const [frankfurter, smtp] = await Promise.all([
@@ -114,8 +114,8 @@ app.get('/api/health/external', async (req, res) => {
     // Log result so it appears in server logs regardless of who called it
     if (!allHealthy) {
       console.error(JSON.stringify({
-        level:     'WARN',
-        event:     'HEALTH_CHECK_FAILED',
+        level: 'WARN',
+        event: 'HEALTH_CHECK_FAILED',
         frankfurter,
         smtp,
         timestamp: new Date().toISOString(),
@@ -145,9 +145,9 @@ app.use((err, req, res, next) => {
   console.error('[Global Error Handler]', err.stack || err.message)
 
   // Do not expose internal error details in production
-  const isDev     = process.env.NODE_ENV !== 'production'
-  const message   = err.message || 'An unexpected error occurred'
-  const status    = err.status  || err.statusCode || 500
+  const isDev = process.env.NODE_ENV !== 'production'
+  const message = err.message || 'An unexpected error occurred'
+  const status = err.status || err.statusCode || 500
 
   res.status(status).json({
     message,
@@ -156,7 +156,7 @@ app.use((err, req, res, next) => {
 })
 
 // ── Connect to MongoDB then start server ──────
-const PORT      = process.env.PORT      || 5000
+const PORT = process.env.PORT || 5000
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/Arc'
 
 mongoose.connect(MONGO_URI)
@@ -181,7 +181,7 @@ mongoose.connect(MONGO_URI)
     setTimeout(async () => {
       try {
         const { testFrankfurterConnectivity } = require('./src/controllers/analyticsController')
-        const { testSmtpConnectivity }        = require('./src/jobs/emailService')
+        const { testSmtpConnectivity } = require('./src/jobs/emailService')
 
         const [frankfurter, smtp] = await Promise.all([
           testFrankfurterConnectivity(),
@@ -192,12 +192,12 @@ mongoose.connect(MONGO_URI)
           console.log(`✅ Frankfurter FX API reachable (${frankfurter.latencyMs}ms)`)
         } else {
           console.error(JSON.stringify({
-            level:     'WARN',
-            event:     'EXTERNAL_API_FAILURE',
-            api:       'Frankfurter FX Rates',
-            url:       'https://api.frankfurter.dev/v1/latest?base=USD',
-            reason:    frankfurter.error || `HTTP ${frankfurter.statusCode}`,
-            action:    'Dashboard will show original currencies until resolved',
+            level: 'WARN',
+            event: 'EXTERNAL_API_FAILURE',
+            api: 'Frankfurter FX Rates',
+            url: 'https://api.frankfurter.dev/v1/latest?base=USD',
+            reason: frankfurter.error || `HTTP ${frankfurter.statusCode}`,
+            action: 'Dashboard will show original currencies until resolved',
             timestamp: new Date().toISOString(),
           }))
         }
@@ -208,12 +208,12 @@ mongoose.connect(MONGO_URI)
           console.warn('⚠️  SMTP not configured — forgot-password and reminder emails disabled')
         } else {
           console.error(JSON.stringify({
-            level:     'WARN',
-            event:     'EXTERNAL_API_FAILURE',
-            api:       'Gmail SMTP',
-            host:      'smtp.gmail.com',
-            reason:    smtp.error,
-            action:    'Forgot-password and reminder emails will fail until resolved',
+            level: 'WARN',
+            event: 'EXTERNAL_API_FAILURE',
+            api: 'Gmail SMTP',
+            host: 'smtp.gmail.com',
+            reason: smtp.error,
+            action: 'Forgot-password and reminder emails will fail until resolved',
             timestamp: new Date().toISOString(),
           }))
         }
